@@ -1,0 +1,10 @@
+{
+  "id": "weather-fetcher",
+  "name": "Weather Fetcher",
+  "version": "0.0.1",
+  "minAppVersion": "0.12.0",
+  "description": "Fetch and insert current weather into the editor of Obsidian.",
+  "author": "fyears",
+  "authorUrl": "https://github.com/fyears/obsidian-weather",
+  "isDesktopOnly": false
+}

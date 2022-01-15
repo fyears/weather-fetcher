@@ -1,0 +1,34 @@
+{
+  "name": "weather-fetcher",
+  "version": "0.0.1",
+  "description": "Fetch and insert current weather into the editor of Obsidian.",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+    "format": "npx prettier --write .",
+    "clean": "npx rimraf main.js",
+    "lint": "npx eslint main.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/feather-icons": "^4.7.0",
+    "@types/lodash": "^4.14.178",
+    "@types/node": "^16.11.6",
+    "@typescript-eslint/eslint-plugin": "^5.2.0",
+    "@typescript-eslint/parser": "^5.2.0",
+    "builtin-modules": "^3.2.0",
+    "esbuild": "0.13.12",
+    "eslint": "^8.6.0",
+    "obsidian": "^0.12.17",
+    "prettier": "^2.5.1",
+    "tslib": "2.3.1",
+    "typescript": "4.4.4"
+  },
+  "dependencies": {
+    "feather-icons": "^4.28.0",
+    "lodash": "^4.17.21"
+  }
+}
