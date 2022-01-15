@@ -8,6 +8,7 @@ import {
   PluginSettingTab,
   Setting,
   addIcon,
+  Platform,
 } from "obsidian";
 import cloneDeep from "lodash/cloneDeep";
 import isEmpty from "lodash/isEmpty";
@@ -39,6 +40,36 @@ const selectedIcon = feather.icons["sun"].toSvg({
   height: 100,
 });
 
+/**
+ * A trick from https://gist.github.com/liamcain/3f21f1ee820cb30f18050d2f3ad85f3f
+ * @param plugin
+ * @returns
+ */
+const monkeyPatchConsole = (plugin: Plugin) => {
+  if (!Platform.isIosApp) {
+    // we only need to get log from ios
+    return;
+  }
+
+  const logFile = `${plugin.manifest.dir}/logs.txt`;
+  const logs: string[] = [];
+  const logMessages =
+    (prefix: string) =>
+    (...messages: unknown[]) => {
+      logs.push(`\n[${prefix}]`);
+      for (const message of messages) {
+        logs.push(String(message));
+      }
+      plugin.app.vault.adapter.write(logFile, logs.join(" "));
+    };
+
+  console.debug = logMessages("debug");
+  console.error = logMessages("error");
+  console.info = logMessages("info");
+  console.log = logMessages("log");
+  console.warn = logMessages("warn");
+};
+
 export default class WeatherPlugin extends Plugin {
   settings: WeatherPluginSettings;
   cachedPrevCall: CachedCallType;
@@ -46,6 +77,8 @@ export default class WeatherPlugin extends Plugin {
   commandEnabled: boolean;
 
   async onload() {
+    monkeyPatchConsole(this);
+    console.log("loading WeatherPlugin");
     await this.loadSettings();
     this.cachedPrevCall = {};
     this.weatherRibbon = undefined;
@@ -63,7 +96,9 @@ export default class WeatherPlugin extends Plugin {
     this.addSettingTab(new WeatherSettingTab(this.app, this));
   }
 
-  onunload() {}
+  onunload() {
+    console.log("unloading WeatherPlugin");
+  }
 
   async loadSettings() {
     this.settings = Object.assign(
