@@ -1,6 +1,6 @@
 {
   "name": "weather-fetcher",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Fetch and insert current weather into the editor of Obsidian.",
   "main": "main.js",
   "scripts": {
