@@ -10,8 +10,6 @@ import {
   addIcon,
   Platform,
 } from "obsidian";
-import cloneDeep from "lodash/cloneDeep";
-import isEmpty from "lodash/isEmpty";
 import feather from "feather-icons";
 
 type DataSourceType = "not-selected" | "wttr" | "openweathermap";
@@ -41,34 +39,15 @@ const selectedIcon = feather.icons["sun"].toSvg({
 });
 
 /**
- * A trick from https://gist.github.com/liamcain/3f21f1ee820cb30f18050d2f3ad85f3f
- * @param plugin
- * @returns
+ * https://stackoverflow.com/questions/679915/how-do-i-test-for-an-empty-javascript-object
+ * @param obj 
+ * @returns 
  */
-const monkeyPatchConsole = (plugin: Plugin) => {
-  if (!Platform.isIosApp) {
-    // we only need to get log from ios
-    return;
-  }
-
-  const logFile = `${plugin.manifest.dir}/logs.txt`;
-  const logs: string[] = [];
-  const logMessages =
-    (prefix: string) =>
-    (...messages: unknown[]) => {
-      logs.push(`\n[${prefix}]`);
-      for (const message of messages) {
-        logs.push(String(message));
-      }
-      plugin.app.vault.adapter.write(logFile, logs.join(" "));
-    };
-
-  console.debug = logMessages("debug");
-  console.error = logMessages("error");
-  console.info = logMessages("info");
-  console.log = logMessages("log");
-  console.warn = logMessages("warn");
-};
+const isEmptyObj = (obj: any) => {
+  return obj // 👈 null and undefined check
+    && Object.keys(obj).length === 0
+    && Object.getPrototypeOf(obj) === Object.prototype
+}
 
 export default class WeatherPlugin extends Plugin {
   settings: WeatherPluginSettings;
@@ -77,7 +56,6 @@ export default class WeatherPlugin extends Plugin {
   commandEnabled: boolean;
 
   async onload() {
-    monkeyPatchConsole(this);
     console.log("loading WeatherPlugin");
     await this.loadSettings();
     this.cachedPrevCall = {};
@@ -103,7 +81,7 @@ export default class WeatherPlugin extends Plugin {
   async loadSettings() {
     this.settings = Object.assign(
       {},
-      cloneDeep(DEFAULT_SETTINGS),
+      DEFAULT_SETTINGS,
       await this.loadData()
     );
   }
@@ -129,7 +107,7 @@ export default class WeatherPlugin extends Plugin {
     return undefined;
   }
 
-  async addWeatherRibbon() {
+  addWeatherRibbon() {
     if (this.weatherRibbon !== undefined) {
       return;
     }
@@ -204,7 +182,7 @@ export default class WeatherPlugin extends Plugin {
       id: "weather-output-cache",
       name: "Output current cached weather info. For debugging purposes.",
       editorCallback: async (editor: Editor, view: MarkdownView) => {
-        if (this.cachedPrevCall === undefined || isEmpty(this.cachedPrevCall)) {
+        if (this.cachedPrevCall === undefined || isEmptyObj(this.cachedPrevCall)) {
           new Notice("No cached weather info, no output.");
         } else {
           const outputCode =
@@ -344,7 +322,7 @@ class WeatherSettingTab extends PluginSettingTab {
             this.plugin.settings.addRibbon = val;
             await this.plugin.saveSettings();
             if (val) {
-              await this.plugin.addWeatherRibbon();
+              this.plugin.addWeatherRibbon();
             } else {
               this.plugin.removeWeatherRibbon();
             }

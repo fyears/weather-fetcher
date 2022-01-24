@@ -15,7 +15,6 @@
   "license": "MIT",
   "devDependencies": {
     "@types/feather-icons": "^4.7.0",
-    "@types/lodash": "^4.14.178",
     "@types/node": "^16.11.6",
     "@typescript-eslint/eslint-plugin": "^5.2.0",
     "@typescript-eslint/parser": "^5.2.0",
@@ -28,7 +27,6 @@
     "typescript": "4.4.4"
   },
   "dependencies": {
-    "feather-icons": "^4.28.0",
-    "lodash": "^4.17.21"
+    "feather-icons": "^4.28.0"
   }
 }
